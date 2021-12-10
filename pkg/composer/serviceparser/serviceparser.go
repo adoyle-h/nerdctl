@@ -517,6 +517,16 @@ func newContainer(project *compose.Project, parsed *Service, i int) (*Container,
 		}
 	}
 
+	for _, config := range svc.Networks {
+		if config.Ipv4Address != "" {
+			c.RunArgs = append(c.RunArgs, "--ip="+config.Ipv4Address)
+		}
+
+		if config.Ipv6Address != "" {
+			c.RunArgs = append(c.RunArgs, "--ip6="+config.Ipv6Address)
+		}
+	}
+
 	if svc.Pid != "" {
 		c.RunArgs = append(c.RunArgs, "--pid="+svc.Pid)
 	}

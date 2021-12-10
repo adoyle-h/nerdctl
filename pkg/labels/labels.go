@@ -47,6 +47,12 @@ const (
 	// ExtraHosts are HostIPs to appended to /etc/hosts
 	ExtraHosts = Prefix + "extraHosts"
 
+	// ipv4
+	Ipv4 = Prefix + "ipv4"
+
+	// ipv6
+	Ipv6 = Prefix + "ipv6"
+
 	// StateDir is "/var/lib/nerdctl/<ADDRHASH>/containers/<NAMESPACE>/<ID>"
 	StateDir = Prefix + "state-dir"
 

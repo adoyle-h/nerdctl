@@ -121,6 +121,8 @@ func newRunCommand() *cobra.Command {
 	runCommand.RegisterFlagCompletionFunc("net", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return shellCompleteNetworkNames(cmd, []string{})
 	})
+	runCommand.Flags().StringSlice("ip", nil, "IPv4 address")
+	runCommand.Flags().StringSlice("ip6", nil, "IPv6 address")
 	// dns is defined as StringSlice, not StringArray, to allow specifying "--dns=1.1.1.1,8.8.8.8" (compatible with Podman)
 	runCommand.Flags().StringSlice("dns", nil, "Set custom DNS servers")
 	// publish is defined as StringSlice, not StringArray, to allow specifying "--publish=80:80,443:443" (compatible with Podman)
@@ -564,7 +566,7 @@ func runAction(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	extraHosts = strutil.DedupeStrSlice(extraHosts)
-	ilOpt, err := withInternalLabels(ns, name, hostname, stateDir, extraHosts, netSlice, ports, logURI, anonVolumes, pidFile, platform)
+	ilOpt, err := withInternalLabels(cmd, ns, name, hostname, stateDir, extraHosts, netSlice, ports, logURI, anonVolumes, pidFile, platform)
 	if err != nil {
 		return err
 	}
@@ -951,7 +953,7 @@ func withContainerLabels(cmd *cobra.Command) ([]containerd.NewContainerOpts, err
 	return []containerd.NewContainerOpts{o}, nil
 }
 
-func withInternalLabels(ns, name, hostname, containerStateDir string, extraHosts, networks []string, ports []gocni.PortMapping, logURI string, anonVolumes []string, pidFile, platform string) (containerd.NewContainerOpts, error) {
+func withInternalLabels(cmd *cobra.Command, ns, name, hostname, containerStateDir string, extraHosts, networks []string, ports []gocni.PortMapping, logURI string, anonVolumes []string, pidFile, platform string) (containerd.NewContainerOpts, error) {
 	m := make(map[string]string)
 	m[labels.Namespace] = ns
 	if name != "" {
@@ -969,6 +971,19 @@ func withInternalLabels(ns, name, hostname, containerStateDir string, extraHosts
 		return nil, err
 	}
 	m[labels.Networks] = string(networksJSON)
+
+	ipv4, err := cmd.Flags().GetString("ip")
+	if err != nil {
+		return nil, err
+	}
+	m[labels.Ipv4] = string(ipv4)
+
+	ipv6, err := cmd.Flags().GetString("ipv6")
+	if err != nil {
+		return nil, err
+	}
+	m[labels.Ipv6] = string(ipv6)
+
 	if len(ports) > 0 {
 		portsJSON, err := json.Marshal(ports)
 		if err != nil {
