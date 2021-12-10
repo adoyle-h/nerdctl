@@ -294,10 +294,30 @@ func onCreateRuntime(opts *handlerOpts) error {
 	loadAppArmor()
 
 	if opts.cni != nil {
-		portMapOpts, err := getPortMapOpts(opts)
+		netNSOpts, err := getPortMapOpts(opts)
 		if err != nil {
 			return err
 		}
+
+		var ips []string
+		ipv4 := opts.state.Annotations[labels.Ipv4]
+		if ipv4 != "" {
+			ips = append(ips, ipv4)
+		}
+		ipv6 := opts.state.Annotations[labels.Ipv6]
+		if ipv6 != "" {
+			ips = append(ips, ipv6)
+		}
+
+		if len(ips) > 0 {
+			buf, err := json.Marshal(ips)
+			if err != nil {
+				return err
+			}
+			// https://www.cni.dev/plugins/current/ipam/host-local/#supported-arguments
+			netNSOpts = append(netNSOpts, gocni.WithArgs("ips", string(buf)))
+		}
+
 		nsPath, err := getNetNSPath(opts.state)
 		if err != nil {
 			return err
@@ -315,7 +335,7 @@ func onCreateRuntime(opts *handlerOpts) error {
 			ExtraHosts: opts.extraHosts,
 			Name:       opts.state.Annotations[labels.Name],
 		}
-		cniRes, err := opts.cni.Setup(ctx, opts.fullID, nsPath, portMapOpts...)
+		cniRes, err := opts.cni.Setup(ctx, opts.fullID, nsPath, netNSOpts...)
 		if err != nil {
 			return fmt.Errorf("failed to call cni.Setup: %w", err)
 		}
