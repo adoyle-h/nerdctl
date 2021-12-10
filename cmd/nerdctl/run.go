@@ -121,8 +121,8 @@ func newRunCommand() *cobra.Command {
 	runCommand.RegisterFlagCompletionFunc("net", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		return shellCompleteNetworkNames(cmd, []string{})
 	})
-	runCommand.Flags().StringSlice("ip", nil, "IPv4 address")
-	runCommand.Flags().StringSlice("ip6", nil, "IPv6 address")
+	runCommand.Flags().String("ip", "", "IPv4 address")
+	runCommand.Flags().String("ip6", "", "IPv6 address")
 	// dns is defined as StringSlice, not StringArray, to allow specifying "--dns=1.1.1.1,8.8.8.8" (compatible with Podman)
 	runCommand.Flags().StringSlice("dns", nil, "Set custom DNS servers")
 	// publish is defined as StringSlice, not StringArray, to allow specifying "--publish=80:80,443:443" (compatible with Podman)

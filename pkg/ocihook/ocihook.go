@@ -330,9 +330,12 @@ func onCreateRuntime(opts *handlerOpts) error {
 		cniResRaw := cniRes.Raw()
 		for i, cniName := range opts.cniNames {
 			network := cniResRaw[i]
-			network.IPs[0].Address = net.IPNet{
-				IP:   net.ParseIP(opts.state.Annotations[labels.Ipv4]),
-				Mask: network.IPs[0].Address.Mask,
+			ipv4 := opts.state.Annotations[labels.Ipv4]
+			if ipv4 != "" {
+				network.IPs[0].Address = net.IPNet{
+					IP:   net.ParseIP(ipv4),
+					Mask: network.IPs[0].Address.Mask,
+				}
 			}
 			hsMeta.Networks[cniName] = network
 		}
