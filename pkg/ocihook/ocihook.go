@@ -294,10 +294,6 @@ type CNIArgsBody struct {
 	Ips []string `json:"ips"`
 }
 
-type CNIArgs struct {
-	Cni CNIArgsBody `json:"cni"`
-}
-
 func onCreateRuntime(opts *handlerOpts) error {
 	loadAppArmor()
 
@@ -318,7 +314,7 @@ func onCreateRuntime(opts *handlerOpts) error {
 		}
 
 		if len(ips) > 0 {
-			buf, err := json.Marshal(CNIArgs{CNIArgsBody{ips}})
+			buf, err := json.Marshal(CNIArgsBody{ips})
 			if err != nil {
 				return err
 			}
