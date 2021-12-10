@@ -290,14 +290,6 @@ func getPortMapOpts(opts *handlerOpts) ([]gocni.NamespaceOpts, error) {
 	return nil, nil
 }
 
-func replaceIP(c *types100.IPConfig, opts *handlerOpts) error {
-	c.Address = net.IPNet{
-		IP:   net.IP(opts.state.Annotations[labels.Ipv4]),
-		Mask: net.IPMask("/24"),
-	}
-	return nil
-}
-
 func onCreateRuntime(opts *handlerOpts) error {
 	loadAppArmor()
 
@@ -329,15 +321,7 @@ func onCreateRuntime(opts *handlerOpts) error {
 		}
 		cniResRaw := cniRes.Raw()
 		for i, cniName := range opts.cniNames {
-			network := cniResRaw[i]
-			ipv4 := opts.state.Annotations[labels.Ipv4]
-			if ipv4 != "" {
-				network.IPs[0].Address = net.IPNet{
-					IP:   net.ParseIP(ipv4),
-					Mask: network.IPs[0].Address.Mask,
-				}
-			}
-			hsMeta.Networks[cniName] = network
+			hsMeta.Networks[cniName] = cniResRaw[i]
 		}
 
 		if err := hs.Acquire(hsMeta); err != nil {
