@@ -978,7 +978,7 @@ func withInternalLabels(cmd *cobra.Command, ns, name, hostname, containerStateDi
 	}
 	m[labels.Ipv4] = string(ipv4)
 
-	ipv6, err := cmd.Flags().GetString("ipv6")
+	ipv6, err := cmd.Flags().GetString("ip6")
 	if err != nil {
 		return nil, err
 	}
