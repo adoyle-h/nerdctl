@@ -319,7 +319,7 @@ func onCreateRuntime(opts *handlerOpts) error {
 				return err
 			}
 			// https://www.cni.dev/plugins/current/ipam/host-local/#supported-arguments
-			netNSOpts = append(netNSOpts, gocni.WithArgs("cni", string(buf)))
+			netNSOpts = append(netNSOpts, gocni.WithArgs("ip", ipv4))
 		}
 
 		nsPath, err := getNetNSPath(opts.state)
