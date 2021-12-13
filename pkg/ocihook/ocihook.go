@@ -291,7 +291,7 @@ func getPortMapOpts(opts *handlerOpts) ([]gocni.NamespaceOpts, error) {
 }
 
 type CNIArgsBody struct {
-	Ips []string `json:"ips"`
+	IPs []string `json:"ips"`
 }
 
 func onCreateRuntime(opts *handlerOpts) error {
@@ -314,11 +314,12 @@ func onCreateRuntime(opts *handlerOpts) error {
 		}
 
 		if len(ips) > 0 {
+			buf, err := json.Marshal(ips)
 			if err != nil {
 				return err
 			}
 			// https://www.cni.dev/plugins/current/ipam/host-local/#supported-arguments
-			netNSOpts = append(netNSOpts, gocni.WithArgs("ip", ipv4))
+			netNSOpts = append(netNSOpts, gocni.WithArgs("IPs", string(buf[:])))
 		}
 
 		nsPath, err := getNetNSPath(opts.state)
