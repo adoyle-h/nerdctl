@@ -314,7 +314,6 @@ func onCreateRuntime(opts *handlerOpts) error {
 		}
 
 		if len(ips) > 0 {
-			buf, err := json.Marshal(CNIArgsBody{ips})
 			if err != nil {
 				return err
 			}
